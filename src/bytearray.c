@@ -4,21 +4,23 @@
 #include <assert.h>
 #include "bytearray.h"
 
-#define BA_CHUNK_SIZE    255
-#define BA_INITIAL_MEM   BA_CHUNK_SIZE
+#ifndef CU_BYTEARRAY_CHUNK_SIZE
+#   define CU_BYTEARRAY_CHUNK_SIZE    255
+#endif
+#define CU_BYTEARRAY_INITIAL_MEM      CU_BYTEARRAY_CHUNK_SIZE
 
 /* ===========================================================================
    Private functions
    =========================================================================*/
 
-#define BA_CHUNKED_SZ(i) (((i) / BA_CHUNK_SIZE + 1) * BA_CHUNK_SIZE)
+#define BA_CHUNKED_SZ(i) (((i) / CU_BYTEARRAY_CHUNK_SIZE + 1) * CU_BYTEARRAY_CHUNK_SIZE)
 
 static struct bytearray *ba_init(struct bytearray *ba, int sz)
 {
     ba->elements_used = 0;
 
     if (sz == -1 || sz > 0) {
-        sz = sz == -1 ? BA_INITIAL_MEM : BA_CHUNKED_SZ(sz);
+        sz = sz == -1 ? CU_BYTEARRAY_INITIAL_MEM : BA_CHUNKED_SZ(sz);
 
         /* Always want to have an extra element for '\0'
          */
