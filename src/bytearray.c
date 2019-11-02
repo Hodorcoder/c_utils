@@ -228,12 +228,12 @@ bytearray *ba_append(bytearray *ba, const BYTE *bytes, size_t len)
 
 int ba_printf(bytearray *ba, const char *format, ...)
 {
-    /* Limitiation: vsnprintf() returns an int so the max size that
+    /* Limitation: vsnprintf() returns an int so the max size that
      * this function can set the byte array to is limited by that
      * (also considering that we always want to be able to have space
      * for a NULL terminating character. Therefore we can't do anything more
      * than INT_MAX - 1.
-     * For snprintf() to calculate how much room is needed, i.e. by passing
+     * For vsnprintf() to calculate how much room is needed, i.e. by passing
      * NULL as the destination, requires at least c99.
      */
     size_t len;
@@ -254,9 +254,8 @@ int ba_printf(bytearray *ba, const char *format, ...)
             return -1;
     }
 
-    len++;  // Room for the '\0' has been allocated
+    len++;  // Additional room for the '\0' has been allocated by ba_resize()
 
-    va_end(args);
     va_start(args, format);
     written_count = vsnprintf((char *)ba->mem, len, format, args);
     if (written_count < 0)
