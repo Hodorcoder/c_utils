@@ -58,6 +58,13 @@ void test_bytearray(void)
         printf("size is %zu\n", ba_size(ba));
         printf("Hex dump:\n");
         ba_hexdump(stdout, ba, 4);
+
+        ba_clear(ba);
+        ba_shrinktofit(ba);
+        ba_printf(ba, "%d", -12345678);
+        printf("ba can hold %zu elements\n", ba_max_elements(ba));
+        printf("ba as a string is \"%s\"\n", ba_cstr(ba));
+        printf("size is %zu\n", ba_size(ba));
     }
 
     ba_destroy(&ba);

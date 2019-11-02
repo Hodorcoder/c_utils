@@ -1,13 +1,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <assert.h>
+#include <limits.h>
 #include "bytearray.h"
 
 #ifndef CU_BYTEARRAY_CHUNK_SIZE
 #   define CU_BYTEARRAY_CHUNK_SIZE    255
 #endif
 #define CU_BYTEARRAY_INITIAL_MEM      CU_BYTEARRAY_CHUNK_SIZE
+
+// FIXME: TODO: !!!!! Any code in here that uses size_t needs to be checked
+// to ensure that, e.g. max_elements, is never more than size_t - 1 because
+// all these functions allocate an extra element so that there is always
+// room for a terminating '\0'. CHECK AND FIX WHERE NECESSARY
+
+// FIXME: There's a problem with "chuncked" allocation; i.e. if resizing
+// up overflows there's a small problem. Add checks to fix this
 
 /* ===========================================================================
    Private functions
@@ -42,6 +52,7 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
     }
 
     ba->resize_flags = BA_RESIZE_UP_CHUNKED | BA_RESIZE_DN_EXACT;
+    //ba->resize_flags = BA_RESIZE_UP_EXACT | BA_RESIZE_DN_EXACT;
 
     return ba;
 }
@@ -213,6 +224,45 @@ bytearray *ba_append(bytearray *ba, const BYTE *bytes, size_t len)
     ba->mem[newlen] = '\0';
     ba->elements_used = newlen;
     return ba;
+}
+
+int ba_printf(bytearray *ba, const char *format, ...)
+{
+    /* Limitiation: vsnprintf() returns an int so the max size that
+     * this function can set the byte array to is limited by that
+     * (also considering that we always want to be able to have space
+     * for a NULL terminating character. Therefore we can't do anything more
+     * than INT_MAX - 1.
+     * For snprintf() to calculate how much room is needed, i.e. by passing
+     * NULL as the destination, requires at least c99.
+     */
+    size_t len;
+    va_list args;
+    int written_count;
+
+    assert(ba != NULL && format != NULL); // pre-conditions
+
+    va_start(args, format);
+    written_count = vsnprintf(NULL, 0, format, args);
+    if (written_count < 0)
+        return written_count;
+
+    len = written_count;
+
+    if (ba->max_elements < len) {
+        if (!ba_resize(ba, len))
+            return -1;
+    }
+
+    len++;  // Room for the '\0' has been allocated
+
+    va_end(args);
+    va_start(args, format);
+    written_count = vsnprintf((char *)ba->mem, len, format, args);
+    if (written_count < 0)
+        return written_count;
+    ba->elements_used = written_count;
+    return written_count;
 }
 
 void ba_hexdump(FILE *f, bytearray *ba, int bytesperline)
