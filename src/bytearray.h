@@ -1,0 +1,38 @@
+#ifndef CU_INCLUDE_BYTEARRAY_H
+#define CU_INCLUDE_BYTEARRAY_H
+
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include "types.h"
+
+#define BA_RESIZE_UP_EXACT       1U << 0
+#define BA_RESIZE_UP_CHUNKED     1U << 1
+#define BA_RESIZE_DN_EXACT       1U << 2    /* TODO: Implement */
+#define BA_RESIZE_DN_CHUNKED     1U << 3    /* TODO: Implement */
+
+
+typedef struct bytearray {
+    size_t max_elements;
+    size_t elements_used;
+    BYTE *mem;
+    unsigned resize_flags;
+} bytearray;
+
+bytearray *ba_new(int sz);
+void ba_set_resize_strategy(bytearray *ba, unsigned flags);
+void ba_destroy(bytearray **ba);
+bool ba_isfull(const bytearray *ba);
+size_t ba_max_elements(const bytearray *ba);
+size_t ba_size(const bytearray *ba);
+const char *ba_cstr(const bytearray *ba);
+bytearray *ba_clear(bytearray *ba);
+bytearray *ba_shrinktofit(bytearray *ba);
+bytearray *ba_set_from_cstr(bytearray *ba, const char *str);
+bytearray *ba_set(bytearray *ba, const BYTE *from, size_t len);
+bytearray *ba_append_cstr(bytearray *ba, const char *str);
+bytearray *ba_append(bytearray *ba, const BYTE *bytes, size_t len);
+void ba_hexdump(FILE *f, bytearray *ba, int bytesperline);
+BYTE ba_at(const bytearray *ba, size_t pos);
+
+#endif /* CU_INCLUDE_BYTEARRAY_H */
