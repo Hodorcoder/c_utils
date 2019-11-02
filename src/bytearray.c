@@ -17,6 +17,8 @@
 
 static struct bytearray *ba_init(struct bytearray *ba, int sz)
 {
+    assert(ba != NULL); // pre-condition
+
     ba->elements_used = 0;
 
     if (sz == -1 || sz > 0) {
@@ -47,6 +49,8 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
 static bytearray *ba_resize(bytearray *ba, size_t max_elements)
 {
     size_t len;
+
+    assert(ba != NULL); // pre-condition
 
     if (max_elements == ba->max_elements) {
         return ba;
@@ -92,12 +96,16 @@ bytearray *ba_new(int sz)
 
 void ba_set_resize_strategy(bytearray *ba, unsigned flags)
 {
+    assert(ba != NULL); // pre-condition
+
     ba->resize_flags = flags;
 }
 
 
 void ba_destroy(bytearray **ba)
 {
+    assert(ba != NULL); // pre-condition
+
     free((*ba)->mem);
     free(*ba);
     *ba = NULL;
@@ -105,26 +113,32 @@ void ba_destroy(bytearray **ba)
 
 bool ba_isfull(const bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
     return ba->elements_used >= ba->max_elements;
 }
 
 size_t ba_max_elements(const bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
     return ba->max_elements;
 }
 
 size_t ba_size(const bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
     return ba->elements_used;
 }
 
 const char *ba_cstr(const bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
     return (const char *)ba->mem;
 }
 
 bytearray *ba_clear(bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
+
     if (ba->mem) {
         ba->mem[0] = '\0';
         ba->elements_used = 0;
@@ -134,6 +148,8 @@ bytearray *ba_clear(bytearray *ba)
 
 bytearray *ba_shrinktofit(bytearray *ba)
 {
+    assert(ba != NULL); // pre-condition
+
     if (ba->max_elements > ba->elements_used) {
         BYTE *newmem;
         size_t newlen = ba->elements_used + 1;
@@ -151,11 +167,17 @@ bytearray *ba_shrinktofit(bytearray *ba)
 
 bytearray *ba_set_from_cstr(bytearray *ba, const char *str)
 {
+    assert(ba != NULL);  // pre-condition
+    assert(str != NULL); // pre-condition
+
     return ba_set(ba, (const BYTE *)str, strlen(str));
 }
 
 bytearray *ba_set(bytearray *ba, const BYTE *from, size_t len)
 {
+    assert(ba != NULL);   // pre-condition
+    assert(from != NULL); // pre-condition
+
     if (len > ba->max_elements) {
         bytearray *tmp = ba_resize(ba, len);
         if (!tmp)
@@ -169,12 +191,18 @@ bytearray *ba_set(bytearray *ba, const BYTE *from, size_t len)
 
 bytearray *ba_append_cstr(bytearray *ba, const char *str)
 {
+    assert(ba != NULL);  // pre-condition
+    assert(str != NULL); // pre-condition
+
     return ba_append(ba, (const BYTE *)str, strlen(str));
 }
 
 bytearray *ba_append(bytearray *ba, const BYTE *bytes, size_t len)
 {
     size_t newlen;
+
+    assert(ba != NULL);    // pre-condition
+    assert(bytes != NULL); // pre-condition
 
     newlen = len + ba->elements_used;
     if (newlen > ba->max_elements) {
@@ -191,6 +219,9 @@ void ba_hexdump(FILE *f, bytearray *ba, int bytesperline)
 {
     size_t i;
 
+    assert(f != NULL);  // pre-condition
+    assert(ba != NULL); // pre-condition
+
     if (bytesperline < 1)
         bytesperline = 8;
 
@@ -204,6 +235,8 @@ void ba_hexdump(FILE *f, bytearray *ba, int bytesperline)
 
 BYTE ba_at(const bytearray *ba, size_t pos)
 {
+    assert(ba != NULL);  // pre-condition
+
     if (pos >= ba->elements_used)
         return '\0';
     return ba->mem[pos];
