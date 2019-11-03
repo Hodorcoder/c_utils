@@ -253,6 +253,8 @@ int ba_printf(bytearray *ba, const char *format, ...)
 
     va_start(args, format);
     written_count = vsnprintf(NULL, 0, format, args);
+    va_end(args);
+
     if (written_count < 0)
         return written_count;
 
@@ -270,6 +272,7 @@ int ba_printf(bytearray *ba, const char *format, ...)
     if (written_count < 0)
         return written_count;
     ba->elements_used = written_count;
+    va_end(args);
     return written_count;
 }
 
