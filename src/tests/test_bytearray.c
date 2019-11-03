@@ -69,7 +69,56 @@ void test_bytearray(void)
         printf("ba can hold %zu elements\n", ba_max_elements(ba));
         printf("ba as a string is \"%s\"\n", ba_cstr(ba));
         printf("size is %zu\n", ba_size(ba));
+
+        printf("printf append:\n");
+        ba_printf_append(ba, ".%d ABCDEFGHIJKLMNOPQRS", 7654321);
+        printf("ba can hold %zu elements\n", ba_max_elements(ba));
+        printf("ba as a string is \"%s\"\n", ba_cstr(ba));
+        printf("size is %zu\n", ba_size(ba));
+        printf("-----------------------\n");
     }
 
     ba_destroy(&ba);
+    ba_destroy(&ba);
+}
+
+void look_and_say(const char *seed_str, int terms)
+{
+    bytearray *ba1, *ba2, *src, *dest, *tmp;
+
+    if (!seed_str || *seed_str == '\0')
+        return;
+
+    ba1 = ba_new(-1);
+    ba2 = ba_new(-1);
+    if (!ba1 || !ba2)
+        goto end;
+
+    ba_set_from_cstr(ba1, seed_str);
+    src = ba1; dest = ba2;
+
+    printf("%s\n", seed_str);
+
+    for (int i = 0; i < terms; i++) {
+        int count = 1;
+        char search_char = ba_at(src, 0);
+        ba_clear(dest);
+        for (int j = 1; search_char != '\0'; j++) {
+            char ch = ba_at(src, j);
+            if (ch == search_char)
+                count++;
+            else {
+                ba_printf_append(dest, "%d%c", count, search_char);
+                count = 1;
+                search_char = ch;
+            }
+        }
+        printf("%s\n", ba_cstr(dest));
+
+        tmp = src; src = dest; dest = tmp;
+    }
+
+end:
+    ba_destroy(&ba1);
+    ba_destroy(&ba2);
 }
