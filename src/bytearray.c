@@ -276,6 +276,40 @@ int ba_printf(bytearray *ba, const char *format, ...)
     return written_count;
 }
 
+int ba_printf_append(bytearray *ba, const char *format, ...)
+{
+    size_t len;
+    va_list args;
+    int written_count;
+
+    assert(ba != NULL && format != NULL); // pre-conditions
+
+    va_start(args, format);
+    written_count = vsnprintf(NULL, 0, format, args);
+    va_end(args);
+
+    if (written_count < 0)
+        return written_count;
+
+    len = written_count + ba->elements_used;
+
+    if (ba->max_elements < len) {
+        if (!ba_resize(ba, len))
+            return -1;
+    }
+
+    len++;  // Additional room for the '\0' has been allocated by ba_resize()
+
+    va_start(args, format);
+    written_count = vsnprintf((char *)ba->mem + ba->elements_used, len,
+                              format, args);
+    if (written_count < 0)
+        return written_count;
+    ba->elements_used = written_count;
+    va_end(args);
+    return written_count;
+}
+
 void ba_hexdump(FILE *f, bytearray *ba, int bytesperline)
 {
     size_t i;

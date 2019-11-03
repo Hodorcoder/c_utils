@@ -40,6 +40,7 @@ bytearray *ba_set(bytearray *ba, const BYTE *from, unsigned len);
 bytearray *ba_append_cstr(bytearray *ba, const char *str);
 bytearray *ba_append(bytearray *ba, const BYTE *bytes, unsigned len);
 int ba_printf(bytearray *ba, const char *format, ...);
+int ba_printf_append(bytearray *ba, const char *format, ...);
 void ba_hexdump(FILE *f, bytearray *ba, int bytesperline);
 BYTE ba_at(const bytearray *ba, size_t pos);
 
