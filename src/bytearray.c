@@ -126,8 +126,10 @@ void ba_destroy(bytearray **ba)
 {
     assert(ba != NULL); // pre-condition
 
-    free((*ba)->mem);
-    free(*ba);
+    if (*ba) {
+        free((*ba)->mem);
+        free(*ba);
+    }
     *ba = NULL;
 }
 
