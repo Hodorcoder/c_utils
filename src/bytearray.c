@@ -339,14 +339,14 @@ BYTE ba_at(const bytearray *ba, size_t pos)
     return ba->mem[pos];
 }
 
-int ba_cmp(const bytearray *ba1, const bytearray *ba2)
+int ba_strcmp(const bytearray *ba1, const bytearray *ba2)
 {
     assert (ba1 != NULL && ba2 != NULL); // pre-conditions
 
     return strcmp((const char*)ba1->mem, (const char*)ba2->mem);
 }
 
-int ba_cmp_to_cstr(const bytearray *ba, const char *s)
+int ba_strcmp_cstr(const bytearray *ba, const char *s)
 {
     assert (ba != NULL && s != NULL); // pre-conditions
 

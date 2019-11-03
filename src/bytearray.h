@@ -43,8 +43,8 @@ int ba_printf(bytearray *ba, const char *format, ...);
 int ba_printf_append(bytearray *ba, const char *format, ...);
 void ba_hexdump(FILE *f, bytearray *ba, int bytesperline);
 BYTE ba_at(const bytearray *ba, size_t pos);
-int ba_cstr_cmp(const bytearray *ba1, const bytearray *ba2);
-int ba_cstr_cmp_to_cstr(const bytearray *ba, const char *s);
+int ba_strcmp(const bytearray *ba1, const bytearray *ba2);
+int ba_strcmp_cstr(const bytearray *ba, const char *s);
 
 // TODO: FIXME: Implement memcmp functions (because mem can contain \0)
 
