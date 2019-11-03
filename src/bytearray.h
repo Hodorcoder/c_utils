@@ -6,20 +6,27 @@
 #include <stdio.h>
 #include "types.h"
 
-#define BA_RESIZE_UP_EXACT       1U << 0
-#define BA_RESIZE_UP_CHUNKED     1U << 1
-#define BA_RESIZE_DN_EXACT       1U << 2    /* TODO: Implement */
-#define BA_RESIZE_DN_CHUNKED     1U << 3    /* TODO: Implement */
+#define BA_RESIZE_UP_EXACT       (1U << 0)
+#define BA_RESIZE_UP_CHUNKED     (1U << 1)
+#define BA_RESIZE_DN_EXACT       (1U << 2)    /* TODO: Implement */
+#define BA_RESIZE_DN_CHUNKED     (1U << 3)    /* TODO: Implement */
 
+#ifndef CU_DEFAULT_BYTEARRAY_CHUNK_SIZE
+#   define CU_DEFAULT_BYTEARRAY_CHUNK_SIZE    255
+#endif
+#define CU_DEFAULT_BYTEARRAY_INITIAL_MEM      CU_DEFAULT_BYTEARRAY_CHUNK_SIZE
 
 typedef struct bytearray {
     size_t max_elements;
     size_t elements_used;
     BYTE *mem;
     unsigned resize_flags;
+    unsigned chunk_size;
 } bytearray;
 
 bytearray *ba_new(int sz);
+void ba_set_chunksize (bytearray *ba, unsigned sz);
+size_t ba_chunksize(const bytearray *ba);
 void ba_set_resize_strategy(bytearray *ba, unsigned flags);
 void ba_destroy(bytearray **ba);
 bool ba_isfull(const bytearray *ba);

@@ -16,6 +16,8 @@ void test_bytearray(void)
         printf(" 2) ba set to '%s'\n", ba_cstr(ba));
         ba_set_from_cstr(ba, "12");
         ba_shrinktofit(ba);
+        ba_set_chunksize(ba, 1);
+        printf("2a) chunk size set to 1 (exact)\n");
         printf("2b) ba can hold %zu elements\n", ba_max_elements(ba));
         printf("2c) ba set to \"%s\"\n", ba_cstr(ba));
         printf("2d) size (strlen) is %zu\n", ba_size(ba));
@@ -26,6 +28,8 @@ void test_bytearray(void)
         printf(" 5) size (strlen) is %zu\n", ba_size(ba));
         printf("Shrink:\n");
         ba_shrinktofit(ba);
+        ba_set_chunksize(ba, 12);
+        printf("5a) chunk size set to %zu (chunked)\n", ba_chunksize(ba));
         printf("5b) ba can hold %zu elements\n", ba_max_elements(ba));
         ba_append_cstr(ba, " world");
         printf("Appended string:\n");
@@ -37,7 +41,7 @@ void test_bytearray(void)
         printf(" 9) ba can hold %zu elements\n", ba_max_elements(ba));
         printf("10) ba set to \"%s\"\n", ba_cstr(ba));
         printf("11) size is %zu\n", ba_size(ba));
-
+        printf("Setting from array:\n");
         ba_set(ba, arr, sizeof (arr) / sizeof (arr[0]));
         printf("ba can hold %zu elements\n", ba_max_elements(ba));
         printf("ba as a string is \"%s\"\n", ba_cstr(ba));

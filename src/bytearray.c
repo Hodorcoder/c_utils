@@ -6,16 +6,14 @@
 #include <limits.h>
 #include "bytearray.h"
 
-#ifndef CU_BYTEARRAY_CHUNK_SIZE
-#   define CU_BYTEARRAY_CHUNK_SIZE    255
-#endif
-#define CU_BYTEARRAY_INITIAL_MEM      CU_BYTEARRAY_CHUNK_SIZE
-
 /* ===========================================================================
    Private functions
    =========================================================================*/
 
-#define BA_CHUNKED_SZ(i) (((i) / CU_BYTEARRAY_CHUNK_SIZE + 1) * CU_BYTEARRAY_CHUNK_SIZE)
+/* i is the amount (before chunked) requested
+ * z is the chunck size
+ */
+#define BA_CHUNKED_SZ(i, z) (((i) / (z) + 1) * z)
 
 static struct bytearray *ba_init(struct bytearray *ba, int sz)
 {
@@ -23,8 +21,13 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
 
     ba->elements_used = 0;
 
-    if (sz == -1 || sz > 0) {
-        sz = sz == -1 ? CU_BYTEARRAY_INITIAL_MEM : BA_CHUNKED_SZ(sz);
+    if (sz == 0) {
+        ba->mem = NULL;
+        ba->max_elements = 0;
+    }
+    else {
+        sz = sz == -1 ? CU_DEFAULT_BYTEARRAY_INITIAL_MEM
+                      : BA_CHUNKED_SZ(sz, CU_DEFAULT_BYTEARRAY_CHUNK_SIZE);
 
         /* Always want to have an extra element for '\0'
          */
@@ -38,14 +41,9 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
             ba->mem[0] = '\0';
         }
         ba->max_elements = sz;
-    } else {
-        ba->mem = NULL;
-        ba->max_elements = 0;
     }
 
-    ba->resize_flags = BA_RESIZE_UP_CHUNKED | BA_RESIZE_DN_EXACT;
-    //ba->resize_flags = BA_RESIZE_UP_EXACT | BA_RESIZE_DN_EXACT;
-
+    ba_set_chunksize(ba, CU_DEFAULT_BYTEARRAY_CHUNK_SIZE);
     return ba;
 }
 
@@ -59,7 +57,7 @@ static bytearray *ba_resize(bytearray *ba, unsigned max_elements)
         return ba;
     } else if (max_elements > ba->max_elements) {
         if (ba->resize_flags & BA_RESIZE_UP_CHUNKED) {
-            len = BA_CHUNKED_SZ(max_elements);
+            len = BA_CHUNKED_SZ(max_elements, ba->chunk_size);
         } else {
             assert(ba->resize_flags & BA_RESIZE_UP_EXACT);
             len = max_elements;
@@ -95,6 +93,25 @@ bytearray *ba_new(int sz)
     }
 
     return ba;
+}
+
+void ba_set_chunksize (bytearray *ba, unsigned sz)
+{
+    if (sz == 0)
+        sz = 1;
+    ba->chunk_size = sz;
+    if (sz == 1) {
+        ba->resize_flags |= BA_RESIZE_UP_EXACT;
+        ba->resize_flags &= ~BA_RESIZE_UP_CHUNKED;
+    } else {
+        ba->resize_flags &= ~BA_RESIZE_UP_EXACT;
+        ba->resize_flags |= BA_RESIZE_UP_CHUNKED;
+    }
+}
+
+size_t ba_chunksize(const bytearray *ba)
+{
+    return ba->chunk_size;
 }
 
 void ba_set_resize_strategy(bytearray *ba, unsigned flags)
