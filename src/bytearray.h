@@ -45,7 +45,6 @@ void ba_hexdump(FILE *f, bytearray *ba, int bytesperline);
 BYTE ba_at(const bytearray *ba, size_t pos);
 int ba_strcmp(const bytearray *ba1, const bytearray *ba2);
 int ba_strcmp_cstr(const bytearray *ba, const char *s);
-
-// TODO: FIXME: Implement memcmp functions (because mem can contain \0)
+bool ba_cmp(const bytearray *ba1, const bytearray *ba2);
 
 #endif /* CU_INCLUDE_BYTEARRAY_H */
