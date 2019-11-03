@@ -11,14 +11,6 @@
 #endif
 #define CU_BYTEARRAY_INITIAL_MEM      CU_BYTEARRAY_CHUNK_SIZE
 
-// FIXME: TODO: !!!!! Any code in here that uses size_t needs to be checked
-// to ensure that, e.g. max_elements, is never more than size_t - 1 because
-// all these functions allocate an extra element so that there is always
-// room for a terminating '\0'. CHECK AND FIX WHERE NECESSARY
-
-// FIXME: There's a problem with "chuncked" allocation; i.e. if resizing
-// up overflows there's a small problem. Add checks to fix this
-
 /* ===========================================================================
    Private functions
    =========================================================================*/
@@ -57,7 +49,7 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
     return ba;
 }
 
-static bytearray *ba_resize(bytearray *ba, size_t max_elements)
+static bytearray *ba_resize(bytearray *ba, unsigned max_elements)
 {
     size_t len;
 
@@ -184,7 +176,7 @@ bytearray *ba_set_from_cstr(bytearray *ba, const char *str)
     return ba_set(ba, (const BYTE *)str, strlen(str));
 }
 
-bytearray *ba_set(bytearray *ba, const BYTE *from, size_t len)
+bytearray *ba_set(bytearray *ba, const BYTE *from, unsigned len)
 {
     assert(ba != NULL);   // pre-condition
     assert(from != NULL); // pre-condition
@@ -208,7 +200,7 @@ bytearray *ba_append_cstr(bytearray *ba, const char *str)
     return ba_append(ba, (const BYTE *)str, strlen(str));
 }
 
-bytearray *ba_append(bytearray *ba, const BYTE *bytes, size_t len)
+bytearray *ba_append(bytearray *ba, const BYTE *bytes, unsigned len)
 {
     size_t newlen;
 
