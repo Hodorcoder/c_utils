@@ -307,7 +307,7 @@ int ba_printf_append(bytearray *ba, const char *format, ...)
                               format, args);
     if (written_count < 0)
         return written_count;
-    ba->elements_used = written_count;
+    ba->elements_used += written_count;
     va_end(args);
     return written_count;
 }
