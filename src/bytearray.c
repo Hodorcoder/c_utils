@@ -15,6 +15,22 @@
  */
 #define BA_CHUNKED_SZ(i, z) (((i) / (z) + 1) * z)
 
+// TODO: FIXME: Move to a file (maybe cu_math) of its own
+int gcd(int a, int b)
+{
+    if (a < 0)
+        a = -a;
+    if (b < 0)
+        b = -b;
+
+    while (b) {
+        int t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
 static struct bytearray *ba_init(struct bytearray *ba, int sz)
 {
     assert(ba != NULL); // pre-condition
@@ -75,6 +91,56 @@ static bytearray *ba_resize(bytearray *ba, unsigned max_elements)
     ba->mem = new_mem;
     ba->max_elements = len - 1; // -1 because there is extra space for '\0'
     return ba;
+}
+
+static void ba_rotate_left(bytearray *ba, int shift, int n)
+{
+    int i, j, k;
+    int g_cd;
+    char tmp;
+
+    unsigned char *arr = ba->mem;
+
+    g_cd = gcd(shift, n);
+    for (i = 0; i < g_cd; i++) {
+        tmp = arr[i];
+        j = i;
+        while (1) {
+            k = j + shift;
+            if (k >= n)
+                k -= n;
+            if (k == i)
+                break;
+            arr[j] = arr[k];
+            j = k;
+        }
+        arr[j] = tmp;
+    }
+}
+
+static void ba_rotate_right(bytearray *ba, int shift, int n)
+{
+    int i, j, k;
+    int g_cd;
+    char tmp;
+
+    unsigned char *arr = ba->mem;
+
+    g_cd = gcd(shift, n);
+    for (i = 0; i < g_cd; i++) {
+        tmp = arr[i];
+        j = i;
+        while (1) {
+            k = j - shift;
+            if (k < 0)
+                k += n;
+            if (k == i)
+                break;
+            arr[j] = arr[k];
+            j = k;
+        }
+        arr[j] = tmp;
+    }
 }
 
 /* ===========================================================================
@@ -362,4 +428,35 @@ int ba_cmp(const bytearray *ba1, const bytearray *ba2)
         return eu1 < eu2 ? -1 : 1;
 
     return memcmp(ba1->mem, ba2->mem, ba1->elements_used);
+}
+
+void ba_rotate(bytearray *ba, int shift, int n)
+{
+    bool go_left;
+
+    if (ba->elements_used < 2)
+        return;
+
+    if (n == -1)
+        n = ba->elements_used;
+    else if (n > ba->elements_used)
+        n = ba->elements_used;
+
+    /* Rotating 0 or 1 characters of the total sequence makes no sense because
+     * the result would be the same as no rotatation at all for any value of
+     * 'shift'
+     */
+    if (n < 2)
+        return;
+
+    go_left = shift < 0;
+
+    /* No point rotating more than we need to so limit shift.
+     */
+    shift %= n;
+
+    if (go_left)
+        ba_rotate_left(ba, -shift, n);
+    else
+        ba_rotate_right(ba, shift, n);
 }

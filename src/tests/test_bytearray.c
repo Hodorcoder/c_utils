@@ -40,7 +40,18 @@ void test_bytearray(void)
     printf ("Comparing two byte arrays for equality: %s\n", result[ba_cmp(ba, ba2) == 0]);
     ba_clear(ba2);
     printf ("Comparing two byte arrays for equality: %s\n", result[ba_cmp(ba, ba2) != 0]);
-    ba_destroy(&ba2);
+
+    ba_set_from_cstr(ba, "ab");
+    ba_rotate(ba, 1, ba->elements_used);
+    printf("Rotate test 1: %s\n", result[ba_strcmp_cstr(ba, "ba") == 0]);
+
+    ba_set_from_cstr(ba, "hello");
+    ba_rotate(ba, -2, 3);
+    printf("Rotate test 2: (result %s) %s\n", ba_cstr(ba), result[ba_strcmp_cstr(ba, "lhelo") == 0]);
+
+    ba_set_from_cstr(ba, "abcdef");
+    ba_rotate(ba, 2, -1);
+    printf("Rotate test 3: (result %s) %s\n", ba_cstr(ba), result[ba_strcmp_cstr(ba, "efabcd") == 0]);
 
 #if 0
     ba = ba_new(0);
@@ -118,6 +129,7 @@ void test_bytearray(void)
 #endif
     ba_destroy(&ba);
     ba_destroy(&ba);    // destroy a second time (this must be valid)
+    ba_destroy(&ba2);
 }
 
 bytearray *look_and_say(const char *seed_str, int terms)
