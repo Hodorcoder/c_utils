@@ -37,9 +37,9 @@ void test_bytearray(void)
     ba_set(ba, arr, sizeof (arr) / sizeof (arr[0]));
     ba2 = ba_new(-1);
     ba_set(ba2, arr, sizeof (arr) / sizeof (arr[0]));
-    printf ("Comparing two byte arrays for equality: %s\n", result[ba_cmp(ba, ba2)]);
+    printf ("Comparing two byte arrays for equality: %s\n", result[ba_cmp(ba, ba2) == 0]);
     ba_clear(ba2);
-    printf ("Comparing two byte arrays for equality: %s\n", result[!ba_cmp(ba, ba2)]);
+    printf ("Comparing two byte arrays for equality: %s\n", result[ba_cmp(ba, ba2) != 0]);
     ba_destroy(&ba2);
 
 #if 0

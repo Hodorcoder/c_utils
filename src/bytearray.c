@@ -353,12 +353,13 @@ int ba_strcmp_cstr(const bytearray *ba, const char *s)
     return strcmp((const char*)ba->mem, s);
 }
 
-bool ba_cmp(const bytearray *ba1, const bytearray *ba2)
+int ba_cmp(const bytearray *ba1, const bytearray *ba2)
 {
     assert (ba1 != NULL && ba2 != NULL); // pre-conditions
+    size_t eu1 = ba1->elements_used,
+           eu2 = ba2->elements_used;
+    if (eu1 != eu2)
+        return eu1 < eu2 ? -1 : 1;
 
-    if (ba1->elements_used != ba2->elements_used)
-        return false;
-
-    return memcmp(ba1->mem, ba2->mem, ba1->elements_used) == 0;
+    return memcmp(ba1->mem, ba2->mem, ba1->elements_used);
 }
