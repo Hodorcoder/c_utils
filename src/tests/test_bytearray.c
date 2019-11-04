@@ -10,7 +10,7 @@ void test_bytearray(void)
     static const char *result[] = { "FAILED", "Ok"};
     const BYTE arr[] = { '1', '2', '\0', 0, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
 
-    ba = look_and_say("3", 10);
+    ba = look_and_say("3", 10); // with seed of "3", results in A006715
     if (!ba) {
         printf("ba memory allocation failure. Aborting tests\n");
         return;
@@ -167,6 +167,7 @@ bytearray *look_and_say(const char *seed_str, int terms)
 
         tmp = src; src = dest; dest = tmp;
     }
+    ba_destroy(&dest);
     return src;
 
 end:
