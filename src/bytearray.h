@@ -47,6 +47,6 @@ BYTE ba_at(const bytearray *ba, size_t pos);
 int ba_strcmp(const bytearray *ba1, const bytearray *ba2);
 int ba_strcmp_cstr(const bytearray *ba, const char *s);
 int ba_cmp(const bytearray *ba1, const bytearray *ba2);
-void ba_rotate(bytearray *ba, int shift, int n);
+void ba_rotate(bytearray *ba, int shift, size_t n);
 
 #endif /* CU_INCLUDE_BYTEARRAY_H */

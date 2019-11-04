@@ -456,16 +456,14 @@ int ba_cmp(const bytearray *ba1, const bytearray *ba2)
     return memcmp(ba1->mem, ba2->mem, ba1->elements_used);
 }
 
-void ba_rotate(bytearray *ba, int shift, int n)
+void ba_rotate(bytearray *ba, int shift, size_t n)
 {
     bool go_left;
 
     if (ba->elements_used < 2)
         return;
 
-    if (n == -1)
-        n = ba->elements_used;
-    else if (n > ba->elements_used)
+    if (n > ba->elements_used)
         n = ba->elements_used;
 
     /* Rotating 0 or 1 characters of the total sequence makes no sense because
@@ -478,11 +476,13 @@ void ba_rotate(bytearray *ba, int shift, int n)
     go_left = shift < 0;
 
     /* No point rotating more than we need to so limit shift.
+     * Because 'n' is always positive shift will become positive if it's
+     * curently -ve
      */
     shift %= n;
 
     if (go_left)
-        ba_rotate_left(ba, -shift, n);
+        ba_rotate_left(ba, shift, n);
     else
         ba_rotate_right(ba, shift, n);
 }
