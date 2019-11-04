@@ -31,7 +31,7 @@ int gcd(int a, int b)
     return a;
 }
 
-static struct bytearray *ba_init(struct bytearray *ba, int sz)
+static struct bytearray *ba_init(struct bytearray *ba, int sz, bool use_exact_sz)
 {
     assert(ba != NULL); // pre-condition
 
@@ -42,8 +42,10 @@ static struct bytearray *ba_init(struct bytearray *ba, int sz)
         ba->max_elements = 0;
     }
     else {
-        sz = sz == -1 ? CU_DEFAULT_BYTEARRAY_INITIAL_MEM
-                      : BA_CHUNKED_SZ(sz, CU_DEFAULT_BYTEARRAY_CHUNK_SIZE);
+        if (!use_exact_sz || sz < 1) {
+            sz = sz == -1 ? CU_DEFAULT_BYTEARRAY_INITIAL_MEM
+                          : BA_CHUNKED_SZ(sz, CU_DEFAULT_BYTEARRAY_CHUNK_SIZE);
+        }
 
         /* Always want to have an extra element for '\0'
          */
@@ -152,13 +154,37 @@ bytearray *ba_new(int sz)
     struct bytearray *ba;
 
     if ((ba = malloc(sizeof *ba)) != NULL) {
-        if (!ba_init(ba, sz)) {
+        if (!ba_init(ba, sz, false)) {
             free(ba);
             ba = NULL;
         }
     }
 
     return ba;
+}
+
+bytearray *ba_copy(const bytearray *ba)
+{
+    bytearray *ba_copy;
+
+    assert(ba != NULL); // pre-condition
+
+    if ((ba_copy = malloc(sizeof *ba_copy)) != NULL) {
+        /* copy everything except the memory pointer to ensure that the copy
+         * has the same flags, chunk size etc as the original
+         */
+        memcpy(ba_copy, ba, sizeof (*ba_copy));
+        ba_copy->mem = NULL;
+        if (!ba_init(ba_copy, ba->max_elements, true)) {
+            free(ba_copy);
+            ba_copy = NULL;
+        }
+
+        memcpy(ba_copy->mem, ba->mem, ba->elements_used + 1);
+        ba_copy->elements_used = ba->elements_used;
+    }
+
+    return ba_copy;
 }
 
 void ba_set_chunksize (bytearray *ba, unsigned sz)

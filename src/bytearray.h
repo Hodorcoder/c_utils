@@ -25,6 +25,7 @@ typedef struct bytearray {
 } bytearray;
 
 bytearray *ba_new(int sz);
+bytearray *ba_copy(const bytearray *ba);
 void ba_set_chunksize (bytearray *ba, unsigned sz);
 size_t ba_chunksize(const bytearray *ba);
 void ba_set_resize_strategy(bytearray *ba, unsigned flags);

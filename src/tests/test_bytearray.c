@@ -18,7 +18,12 @@ void test_bytearray(void)
     r = ba_strcmp_cstr(ba, "132113213221133112132123222113") == 0;
     printf("Byte array, look-and-see algorithm: %s\n", result[r]);
 
+    ba2 = ba_copy(ba);
+    printf("Byte array copy: %s\n", result[ba_cmp(ba, ba2) == 0]);
+
     ba_destroy(&ba);
+    ba_destroy(&ba2);
+
     printf("Byte array, ba_destroy(): %s\n", result[ba == NULL]);
     ba = ba_new(0);
     if (!ba) {
