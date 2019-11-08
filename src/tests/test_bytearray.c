@@ -58,6 +58,10 @@ void test_bytearray(void)
     ba_rotate(ba, 2, ba->elements_used);
     printf("Rotate test 3: (result %s) %s\n", ba_cstr(ba), result[ba_strcmp_cstr(ba, "efabcd") == 0]);
 
+    ba_set_from_cstr(ba, "abc");
+    ba_rotate(ba, 9, ba->elements_used);
+    printf("Rotate test 4: (result %s) %s\n", ba_cstr(ba), result[ba_strcmp_cstr(ba, "abc") == 0]);
+
 #if 0
     ba = ba_new(0);
     if (ba) {

@@ -95,32 +95,7 @@ static bytearray *ba_resize(bytearray *ba, unsigned max_elements)
     return ba;
 }
 
-static void ba_rotate_left(bytearray *ba, int shift, int n)
-{
-    int i, j, k;
-    int g_cd;
-    char tmp;
-
-    unsigned char *arr = ba->mem;
-
-    g_cd = gcd(shift, n);
-    for (i = 0; i < g_cd; i++) {
-        tmp = arr[i];
-        j = i;
-        while (1) {
-            k = j + shift;
-            if (k >= n)
-                k -= n;
-            if (k == i)
-                break;
-            arr[j] = arr[k];
-            j = k;
-        }
-        arr[j] = tmp;
-    }
-}
-
-static void ba_rotate_right(bytearray *ba, int shift, int n)
+inline static void ba_rotate_lr(bytearray *ba, int shift, int n)
 {
     int i, j, k;
     int g_cd;
@@ -134,8 +109,13 @@ static void ba_rotate_right(bytearray *ba, int shift, int n)
         j = i;
         while (1) {
             k = j - shift;
-            if (k < 0)
-                k += n;
+            if (shift < 0) {
+                if (k >= n)
+                    k -= n;
+            } else {
+                if (k < 0)
+                    k += n;
+            }
             if (k == i)
                 break;
             arr[j] = arr[k];
@@ -473,16 +453,19 @@ void ba_rotate(bytearray *ba, int shift, size_t n)
     if (n < 2)
         return;
 
-    go_left = shift < 0;
+    if (shift < 0) {
+        go_left = 1;
+        shift = -shift;
+    } else {
+        go_left = 0;
+    }
 
-    /* No point rotating more than we need to so limit shift.
-     * Because 'n' is always positive shift will become positive if it's
-     * curently -ve
-     */
     shift %= n;
+    if (shift == 0)
+        return;
 
     if (go_left)
-        ba_rotate_left(ba, shift, n);
+        ba_rotate_lr(ba, -shift, n);
     else
-        ba_rotate_right(ba, shift, n);
+        ba_rotate_lr(ba, shift, n);
 }
