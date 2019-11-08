@@ -15,22 +15,6 @@
  */
 #define BA_CHUNKED_SZ(i, z) (((i) / (z) + 1) * z)
 
-// TODO: FIXME: Move to a file (maybe cu_math) of its own
-int gcd(int a, int b)
-{
-    if (a < 0)
-        a = -a;
-    if (b < 0)
-        b = -b;
-
-    while (b) {
-        int t = a % b;
-        a = b;
-        b = t;
-    }
-    return a;
-}
-
 static struct bytearray *ba_init(struct bytearray *ba, int sz, bool use_exact_sz)
 {
     assert(ba != NULL); // pre-condition
