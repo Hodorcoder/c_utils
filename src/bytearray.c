@@ -158,7 +158,10 @@ bytearray *ba_copy(const bytearray *ba)
         if (!ba_init(ba_copy, ba->max_elements, true)) {
             free(ba_copy);
             ba_copy = NULL;
+            return NULL;
         }
+
+        assert(ba->mem != NULL);
 
         memcpy(ba_copy->mem, ba->mem, ba->elements_used + 1);
         ba_copy->elements_used = ba->elements_used;
