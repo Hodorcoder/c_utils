@@ -1,4 +1,4 @@
-#include "tests/test_bytearray.h"
+#include "tests/test_string.h"
 #include "tests/test_math.h"
 
 int main()
